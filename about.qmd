@@ -1,9 +1,96 @@
 ---
-title: "About"
+title: "Pingüinos de Palmer"
+format:
+  dashboard:
+    orientation: columns
+    theme: cosmo
 ---
 
-About this site
+```{r}
+#| label: setup
+#| include: false
+
+# Si falta algún paquete, instalar con:
+# install.packages(c("palmerpenguins", "dplyr", "ggplot2", "plotly", "DT"))
+
+library(palmerpenguins)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(DT)
+
+datos <- penguins |> filter(!is.na(sex))
+```
+
+## Row {height=20%}
 
 ```{r}
-1 + 1
+#| content: valuebox
+#| title: "Total de pingüinos"
+list(
+  icon = "clipboard-data",
+  color = "primary",
+  value = nrow(datos)
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Especies"
+list(
+  icon = "bar-chart",
+  color = "info",
+  value = length(unique(datos$species))
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Peso promedio (g)"
+list(
+  icon = "graph-up",
+  color = "success",
+  value = round(mean(datos$body_mass_g), 0)
+)
+```
+
+## Row {height=80%}
+
+### Column {width=60%}
+
+```{r}
+#| title: "Largo vs profundidad del pico"
+p <- ggplot(datos, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(size = 2, alpha = 0.7) +
+  labs(x = "Largo del pico (mm)", y = "Profundidad del pico (mm)", color = "Especie") +
+  theme_minimal()
+
+ggplotly(p)
+```
+
+### Column {width=40%}
+
+```{r}
+#| title: "Cantidad por especie"
+ggplot(datos, aes(x = species, fill = species)) +
+  geom_bar() +
+  labs(x = "Especie", y = "Cantidad") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+#| title: "Peso corporal por especie"
+ggplot(datos, aes(x = species, y = body_mass_g, fill = species)) +
+  geom_boxplot() +
+  labs(x = "Especie", y = "Peso corporal (g)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+# Datos
+
+```{r}
+#| title: "Tabla completa"
+datatable(datos, options = list(pageLength = 10))
 ```
